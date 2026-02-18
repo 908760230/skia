@@ -234,6 +234,13 @@ set(codec_SOURCES
     ${SKIA_SRC_DIR}/codec/SkTiffUtility.cpp
     ${SKIA_SRC_DIR}/codec/SkWbmpCodec.cpp
     ${SKIA_SRC_DIR}/codec/SkXmp.cpp
+<<<<<<< Updated upstream
+=======
+    ${SKIA_SRC_DIR}/codec/SkImageGenerator_FromEncoded.cpp
+    ${SKIA_SRC_DIR}/codec/SkPngCodec.cpp
+    ${SKIA_SRC_DIR}/codec/SkPngCodecBase.cpp
+    ${SKIA_SRC_DIR}/codec/SkPngCompositeChunkReader.cpp
+>>>>>>> Stashed changes
     ${codec_HEADERS}
 )
 
@@ -380,6 +387,187 @@ set(effects_SOURCES
     ${effects_HEADERS}
 )
 
+<<<<<<< Updated upstream
+=======
+# 着色器模块
+set(shaders_SOURCES
+    ${SKIA_SRC_DIR}/shaders/SkBitmapProcShader.cpp
+    ${SKIA_SRC_DIR}/shaders/SkBlendShader.cpp
+    ${SKIA_SRC_DIR}/shaders/SkColorFilterShader.cpp
+    ${SKIA_SRC_DIR}/shaders/SkColorShader.cpp
+    ${SKIA_SRC_DIR}/shaders/SkCoordClampShader.cpp
+    ${SKIA_SRC_DIR}/shaders/SkEmptyShader.cpp
+    ${SKIA_SRC_DIR}/shaders/SkGainmapShader.cpp
+    ${SKIA_SRC_DIR}/shaders/SkImageShader.cpp
+    ${SKIA_SRC_DIR}/shaders/SkLocalMatrixShader.cpp
+    ${SKIA_SRC_DIR}/shaders/SkPerlinNoiseShaderImpl.cpp
+    ${SKIA_SRC_DIR}/shaders/SkPictureShader.cpp
+    ${SKIA_SRC_DIR}/shaders/SkRuntimeShader.cpp
+    ${SKIA_SRC_DIR}/shaders/SkShader.cpp
+    ${SKIA_SRC_DIR}/shaders/SkShaderBase.cpp
+    ${SKIA_SRC_DIR}/shaders/SkTransformShader.cpp
+    ${SKIA_SRC_DIR}/shaders/SkTriColorShader.cpp
+    ${SKIA_SRC_DIR}/shaders/SkWorkingColorSpaceShader.cpp
+    # 渐变着色器
+    ${SKIA_SRC_DIR}/shaders/gradients/SkConicalGradient.cpp
+    ${SKIA_SRC_DIR}/shaders/gradients/SkGradientBaseShader.cpp
+    ${SKIA_SRC_DIR}/shaders/gradients/SkLinearGradient.cpp
+    ${SKIA_SRC_DIR}/shaders/gradients/SkRadialGradient.cpp
+    ${SKIA_SRC_DIR}/shaders/gradients/SkSweepGradient.cpp
+)
+
+# Image 模块
+set(image_SOURCES
+    ${SKIA_SRC_DIR}/image/SkImage.cpp
+    ${SKIA_SRC_DIR}/image/SkImage_Base.cpp
+    ${SKIA_SRC_DIR}/image/SkSurface.cpp
+    ${SKIA_SRC_DIR}/image/SkSurface_Base.cpp
+    ${SKIA_SRC_DIR}/image/SkSurface_Raster.cpp
+    ${SKIA_SRC_DIR}/image/SkSurface_Null.cpp
+    ${SKIA_SRC_DIR}/image/SkRescaleAndReadPixels.cpp
+    ${SKIA_SRC_DIR}/image/SkImage_Raster.cpp
+    ${SKIA_SRC_DIR}/image/SkImage_RasterFactories.cpp
+    ${SKIA_SRC_DIR}/image/SkTiledImageUtils.cpp
+    ${SKIA_SRC_DIR}/image/SkPictureImageGenerator.cpp
+    ${SKIA_SRC_DIR}/image/SkImage_Lazy.cpp
+    ${SKIA_SRC_DIR}/image/SkImage_LazyFactories.cpp
+    ${SKIA_SRC_DIR}/image/SkImage_Picture.cpp
+)
+
+# sfnt 模块
+set(sfnt_SOURCES
+    ${SKIA_SRC_DIR}/sfnt/SkOTUtils.cpp
+    ${SKIA_SRC_DIR}/sfnt/SkOTTable_name.cpp
+)
+
+# Encode 模块
+set(encode_SOURCES
+    ${SKIA_SRC_DIR}/encode/SkEncoder.cpp
+    ${SKIA_SRC_DIR}/encode/SkICC.cpp
+    ${SKIA_SRC_DIR}/encode/SkPngEncoderImpl.cpp
+    ${SKIA_SRC_DIR}/encode/SkPngEncoderBase.cpp
+    ${SKIA_SRC_DIR}/encode/SkJpegEncoderImpl.cpp
+    ${SKIA_SRC_DIR}/encode/SkJpegGainmapEncoder.cpp
+    ${SKIA_SRC_DIR}/encode/SkJPEGWriteUtility.cpp
+)
+
+# SkSL 模块
+set(sksl_SOURCES
+    # 核心文件
+    ${SKIA_SRC_DIR}/sksl/SkSLCompiler.cpp
+    ${SKIA_SRC_DIR}/sksl/SkSLContext.cpp
+    ${SKIA_SRC_DIR}/sksl/SkSLParser.cpp
+    ${SKIA_SRC_DIR}/sksl/SkSLLexer.cpp
+    ${SKIA_SRC_DIR}/sksl/SkSLModule.cpp
+    ${SKIA_SRC_DIR}/sksl/SkSLModuleLoader.cpp
+    ${SKIA_SRC_DIR}/sksl/SkSLModuleDataDefault.cpp
+    ${SKIA_SRC_DIR}/sksl/SkSLConstantFolder.cpp
+    ${SKIA_SRC_DIR}/sksl/SkSLAnalysis.cpp
+    ${SKIA_SRC_DIR}/sksl/SkSLBuiltinTypes.cpp
+    ${SKIA_SRC_DIR}/sksl/SkSLInliner.cpp
+    ${SKIA_SRC_DIR}/sksl/SkSLMangler.cpp
+    ${SKIA_SRC_DIR}/sksl/SkSLOperator.cpp
+    ${SKIA_SRC_DIR}/sksl/SkSLPool.cpp
+    ${SKIA_SRC_DIR}/sksl/SkSLString.cpp
+    ${SKIA_SRC_DIR}/sksl/SkSLUtil.cpp
+    ${SKIA_SRC_DIR}/sksl/SkSLErrorReporter.cpp
+    ${SKIA_SRC_DIR}/sksl/SkSLPosition.cpp
+    ${SKIA_SRC_DIR}/sksl/SkSLIntrinsicList.cpp
+    ${SKIA_SRC_DIR}/sksl/SkSLSampleUsage.cpp
+    # IR 文件
+    ${SKIA_SRC_DIR}/sksl/ir/SkSLBinaryExpression.cpp
+    ${SKIA_SRC_DIR}/sksl/ir/SkSLBlock.cpp
+    ${SKIA_SRC_DIR}/sksl/ir/SkSLChildCall.cpp
+    ${SKIA_SRC_DIR}/sksl/ir/SkSLConstructor.cpp
+    ${SKIA_SRC_DIR}/sksl/ir/SkSLConstructorArray.cpp
+    ${SKIA_SRC_DIR}/sksl/ir/SkSLConstructorArrayCast.cpp
+    ${SKIA_SRC_DIR}/sksl/ir/SkSLConstructorCompound.cpp
+    ${SKIA_SRC_DIR}/sksl/ir/SkSLConstructorCompoundCast.cpp
+    ${SKIA_SRC_DIR}/sksl/ir/SkSLConstructorDiagonalMatrix.cpp
+    ${SKIA_SRC_DIR}/sksl/ir/SkSLConstructorMatrixResize.cpp
+    ${SKIA_SRC_DIR}/sksl/ir/SkSLConstructorScalarCast.cpp
+    ${SKIA_SRC_DIR}/sksl/ir/SkSLConstructorSplat.cpp
+    ${SKIA_SRC_DIR}/sksl/ir/SkSLConstructorStruct.cpp
+    ${SKIA_SRC_DIR}/sksl/ir/SkSLDiscardStatement.cpp
+    ${SKIA_SRC_DIR}/sksl/ir/SkSLDoStatement.cpp
+    ${SKIA_SRC_DIR}/sksl/ir/SkSLExpression.cpp
+    ${SKIA_SRC_DIR}/sksl/ir/SkSLExpressionStatement.cpp
+    ${SKIA_SRC_DIR}/sksl/ir/SkSLExtension.cpp
+    ${SKIA_SRC_DIR}/sksl/ir/SkSLFieldAccess.cpp
+    ${SKIA_SRC_DIR}/sksl/ir/SkSLForStatement.cpp
+    ${SKIA_SRC_DIR}/sksl/ir/SkSLFunctionCall.cpp
+    ${SKIA_SRC_DIR}/sksl/ir/SkSLFunctionDeclaration.cpp
+    ${SKIA_SRC_DIR}/sksl/ir/SkSLFunctionDefinition.cpp
+    ${SKIA_SRC_DIR}/sksl/ir/SkSLIfStatement.cpp
+    ${SKIA_SRC_DIR}/sksl/ir/SkSLIndexExpression.cpp
+    ${SKIA_SRC_DIR}/sksl/ir/SkSLInterfaceBlock.cpp
+    ${SKIA_SRC_DIR}/sksl/ir/SkSLLayout.cpp
+    ${SKIA_SRC_DIR}/sksl/ir/SkSLLiteral.cpp
+    ${SKIA_SRC_DIR}/sksl/ir/SkSLModifierFlags.cpp
+    ${SKIA_SRC_DIR}/sksl/ir/SkSLModifiersDeclaration.cpp
+    ${SKIA_SRC_DIR}/sksl/ir/SkSLPostfixExpression.cpp
+    ${SKIA_SRC_DIR}/sksl/ir/SkSLPrefixExpression.cpp
+    ${SKIA_SRC_DIR}/sksl/ir/SkSLProgram.cpp
+    ${SKIA_SRC_DIR}/sksl/ir/SkSLSetting.cpp
+    ${SKIA_SRC_DIR}/sksl/ir/SkSLStructDefinition.cpp
+    ${SKIA_SRC_DIR}/sksl/ir/SkSLSwitchCase.cpp
+    ${SKIA_SRC_DIR}/sksl/ir/SkSLSwitchStatement.cpp
+    ${SKIA_SRC_DIR}/sksl/ir/SkSLSwizzle.cpp
+    ${SKIA_SRC_DIR}/sksl/ir/SkSLSymbol.cpp
+    ${SKIA_SRC_DIR}/sksl/ir/SkSLSymbolTable.cpp
+    ${SKIA_SRC_DIR}/sksl/ir/SkSLTernaryExpression.cpp
+    ${SKIA_SRC_DIR}/sksl/ir/SkSLType.cpp
+    ${SKIA_SRC_DIR}/sksl/ir/SkSLTypeReference.cpp
+    ${SKIA_SRC_DIR}/sksl/ir/SkSLVarDeclarations.cpp
+    ${SKIA_SRC_DIR}/sksl/ir/SkSLVariable.cpp
+    ${SKIA_SRC_DIR}/sksl/ir/SkSLVariableReference.cpp
+    # 分析文件
+    ${SKIA_SRC_DIR}/sksl/analysis/SkSLCanExitWithoutReturningValue.cpp
+    ${SKIA_SRC_DIR}/sksl/analysis/SkSLCheckProgramStructure.cpp
+    ${SKIA_SRC_DIR}/sksl/analysis/SkSLCheckSymbolTableCorrectness.cpp
+    ${SKIA_SRC_DIR}/sksl/analysis/SkSLFinalizationChecks.cpp
+    ${SKIA_SRC_DIR}/sksl/analysis/SkSLGetLoopControlFlowInfo.cpp
+    ${SKIA_SRC_DIR}/sksl/analysis/SkSLGetLoopUnrollInfo.cpp
+    ${SKIA_SRC_DIR}/sksl/analysis/SkSLGetReturnComplexity.cpp
+    ${SKIA_SRC_DIR}/sksl/analysis/SkSLHasSideEffects.cpp
+    ${SKIA_SRC_DIR}/sksl/analysis/SkSLIsConstantExpression.cpp
+    ${SKIA_SRC_DIR}/sksl/analysis/SkSLIsDynamicallyUniformExpression.cpp
+    ${SKIA_SRC_DIR}/sksl/analysis/SkSLIsSameExpressionTree.cpp
+    ${SKIA_SRC_DIR}/sksl/analysis/SkSLIsTrivialExpression.cpp
+    ${SKIA_SRC_DIR}/sksl/analysis/SkSLProgramUsage.cpp
+    ${SKIA_SRC_DIR}/sksl/analysis/SkSLReturnsInputAlpha.cpp
+    ${SKIA_SRC_DIR}/sksl/analysis/SkSLSpecialization.cpp
+    ${SKIA_SRC_DIR}/sksl/analysis/SkSLSwitchCaseContainsExit.cpp
+    ${SKIA_SRC_DIR}/sksl/analysis/SkSLSymbolTableStackBuilder.cpp
+    # 变换文件
+    ${SKIA_SRC_DIR}/sksl/transform/SkSLAddConstToVarModifiers.cpp
+    ${SKIA_SRC_DIR}/sksl/transform/SkSLEliminateDeadFunctions.cpp
+    ${SKIA_SRC_DIR}/sksl/transform/SkSLEliminateDeadGlobalVariables.cpp
+    ${SKIA_SRC_DIR}/sksl/transform/SkSLEliminateDeadLocalVariables.cpp
+    ${SKIA_SRC_DIR}/sksl/transform/SkSLEliminateEmptyStatements.cpp
+    ${SKIA_SRC_DIR}/sksl/transform/SkSLEliminateUnnecessaryBraces.cpp
+    ${SKIA_SRC_DIR}/sksl/transform/SkSLEliminateUnreachableCode.cpp
+    ${SKIA_SRC_DIR}/sksl/transform/SkSLFindAndDeclareBuiltinFunctions.cpp
+    ${SKIA_SRC_DIR}/sksl/transform/SkSLFindAndDeclareBuiltinStructs.cpp
+    ${SKIA_SRC_DIR}/sksl/transform/SkSLFindAndDeclareBuiltinVariables.cpp
+    ${SKIA_SRC_DIR}/sksl/transform/SkSLHoistSwitchVarDeclarationsAtTopLevel.cpp
+    ${SKIA_SRC_DIR}/sksl/transform/SkSLRenamePrivateSymbols.cpp
+    ${SKIA_SRC_DIR}/sksl/transform/SkSLReplaceConstVarsWithLiterals.cpp
+    ${SKIA_SRC_DIR}/sksl/transform/SkSLReplaceSplatCastsWithSwizzles.cpp
+    ${SKIA_SRC_DIR}/sksl/transform/SkSLRewriteIndexedSwizzle.cpp
+    ${SKIA_SRC_DIR}/sksl/transform/SkSLTransform.cpp
+    # 代码生成文件
+    ${SKIA_SRC_DIR}/sksl/codegen/SkSLPipelineStageCodeGenerator.cpp
+    ${SKIA_SRC_DIR}/sksl/codegen/SkSLRasterPipelineBuilder.cpp
+    ${SKIA_SRC_DIR}/sksl/codegen/SkSLRasterPipelineCodeGenerator.cpp
+    ${SKIA_SRC_DIR}/sksl/codegen/SkSLGLSLCodeGenerator.cpp
+    # 追踪文件
+    ${SKIA_SRC_DIR}/sksl/tracing/SkSLDebugTracePlayer.cpp
+    ${SKIA_SRC_DIR}/sksl/tracing/SkSLDebugTracePriv.cpp
+    ${SKIA_SRC_DIR}/sksl/tracing/SkSLTraceHook.cpp
+)
+
+>>>>>>> Stashed changes
 
 
 # GPU 模块
@@ -702,6 +890,46 @@ source_group(gpu/ganesh/effects FILES
 # skcms 源文件分组
 source_group(skcms FILES ${skcms_SOURCES})
 
+<<<<<<< Updated upstream
+=======
+# 文本GPU模块
+set(text_gpu_SOURCES
+    ${SKIA_SRC_DIR}/text/gpu/Slug.cpp
+    ${SKIA_SRC_DIR}/text/gpu/SlugImpl.cpp
+    ${SKIA_SRC_DIR}/text/gpu/SubRunAllocator.cpp
+    ${SKIA_SRC_DIR}/text/gpu/SubRunContainer.cpp
+    ${SKIA_SRC_DIR}/text/gpu/SubRunControl.cpp
+    ${SKIA_SRC_DIR}/text/gpu/TextBlob.cpp
+    ${SKIA_SRC_DIR}/text/gpu/GlyphVector.cpp
+    ${SKIA_SRC_DIR}/text/gpu/StrikeCache.cpp
+    ${SKIA_SRC_DIR}/text/gpu/SDFMaskFilter.cpp
+    ${SKIA_SRC_DIR}/text/gpu/DistanceFieldAdjustTable.cpp
+    ${SKIA_SRC_DIR}/text/gpu/SkChromeRemoteGlyphCache.cpp
+    ${SKIA_SRC_DIR}/text/gpu/TextBlobRedrawCoordinator.cpp
+    ${SKIA_SRC_DIR}/text/gpu/VertexFiller.cpp
+)
+
+# 文本模块
+set(text_SOURCES
+    ${SKIA_SRC_DIR}/text/GlyphRun.cpp
+    ${SKIA_SRC_DIR}/text/SlugFromBuffer.cpp
+    ${SKIA_SRC_DIR}/text/StrikeForGPU.cpp
+)
+
+# Opts模块
+set(opts_SOURCES
+    ${SKIA_SRC_DIR}/opts/SkOpts_hsw.cpp
+    ${SKIA_SRC_DIR}/opts/SkOpts_lasx.cpp
+    ${SKIA_SRC_DIR}/opts/SkOpts_skx.cpp
+)
+
+# sfnt 模块 - 处理 OpenType 字体表
+set(sfnt_SOURCES
+    ${SKIA_SRC_DIR}/sfnt/SkOTUtils.cpp
+    ${SKIA_SRC_DIR}/sfnt/SkOTTable_name.cpp
+)
+
+>>>>>>> Stashed changes
 # 创建 Skia 库
 add_library(skia STATIC
     ${base_SOURCES}
@@ -712,7 +940,21 @@ add_library(skia STATIC
     ${effects_SOURCES}
     ${gpu_SOURCES}
     ${skcms_SOURCES}
+<<<<<<< Updated upstream
+=======
+    ${text_SOURCES}
+    ${text_gpu_SOURCES}
+    ${opts_SOURCES}
+    ${sfnt_SOURCES}
+>>>>>>> Stashed changes
 )
+
+# 为 SkOTTable_name.cpp 禁用重复 case 值警告/错误
+if(MSVC)
+    set_source_files_properties(${SKIA_SRC_DIR}/sfnt/SkOTTable_name.cpp
+        PROPERTIES COMPILE_FLAGS "/wd4065"
+    )
+endif()
 
 # 设置编译选项
 if(MSVC)
