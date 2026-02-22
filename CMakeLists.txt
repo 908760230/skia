@@ -251,6 +251,7 @@ set(core_SOURCES
     ${SKIA_SRC_DIR}/core/SkBlurMaskFilterImpl.cpp
     ${SKIA_SRC_DIR}/core/SkGlyphRunPainter.cpp
     ${SKIA_SRC_DIR}/core/SkSpriteBlitter_ARGB32.cpp
+    ${SKIA_SRC_DIR}/core/SkBlitter_Sprite.cpp
     ${SKIA_SRC_DIR}/core/SkPictureRecorder.cpp
     ${SKIA_SRC_DIR}/core/SkAutoPixmapStorage.cpp
     ${SKIA_SRC_DIR}/core/SkDescriptor.cpp
@@ -913,6 +914,7 @@ set(gpu_SOURCES
     ${SKIA_SRC_DIR}/gpu/ganesh/effects/GrMatrixEffect.cpp
     ${SKIA_SRC_DIR}/gpu/ganesh/effects/GrOvalEffect.cpp
     ${SKIA_SRC_DIR}/gpu/ganesh/effects/GrRRectEffect.cpp
+    ${SKIA_SRC_DIR}/gpu/ganesh/effects/GrModulateAtlasCoverageEffect.cpp
     # OpenGL 后端
     ${SKIA_SRC_DIR}/gpu/ganesh/gl/GrGLUtil.cpp
     ${SKIA_SRC_DIR}/gpu/ganesh/gl/GrGLProgram.cpp
@@ -959,12 +961,58 @@ set(gpu_SOURCES
     ${SKIA_SRC_DIR}/gpu/ganesh/effects/GrTextureEffect.cpp
     ${SKIA_SRC_DIR}/gpu/ganesh/effects/GrDistanceFieldGeoProc.cpp
     ${SKIA_SRC_DIR}/gpu/ganesh/effects/GrBitmapTextGeoProc.cpp
+    ${SKIA_SRC_DIR}/gpu/ganesh/effects/GrSkSLFP.cpp
+    ${SKIA_SRC_DIR}/gpu/ganesh/effects/GrPerlinNoise2Effect.cpp
+    ${SKIA_SRC_DIR}/gpu/ganesh/effects/GrConvexPolyEffect.cpp
+    ${SKIA_SRC_DIR}/gpu/ganesh/effects/GrYUVtoRGBEffect.cpp
+    ${SKIA_SRC_DIR}/gpu/ganesh/gl/builders/GrGLShaderStringBuilder.cpp
     # GPU基础文件
     ${SKIA_SRC_DIR}/gpu/ganesh/GrPipeline.cpp
     ${SKIA_SRC_DIR}/gpu/ganesh/GrProcessorSet.cpp
     ${SKIA_SRC_DIR}/gpu/ganesh/GrOpFlushState.cpp
     ${SKIA_SRC_DIR}/gpu/ganesh/GrMeshDrawTarget.cpp
     ${SKIA_SRC_DIR}/gpu/ganesh/GrDistanceFieldGenFromVector.cpp
+    ${SKIA_SRC_DIR}/gpu/ganesh/GrFragmentProcessors.cpp
+    ${SKIA_SRC_DIR}/gpu/ganesh/GrBackendTextureImageGenerator.cpp
+    ${SKIA_SRC_DIR}/gpu/ganesh/GrTextureProxy.cpp
+    ${SKIA_SRC_DIR}/gpu/ganesh/GrTextureRenderTargetProxy.cpp
+    ${SKIA_SRC_DIR}/gpu/ganesh/GrClientMappedBufferManager.cpp
+    ${SKIA_SRC_DIR}/gpu/ganesh/GrBufferTransferRenderTask.cpp
+    ${SKIA_SRC_DIR}/gpu/ganesh/GrTextureResolveRenderTask.cpp
+    ${SKIA_SRC_DIR}/gpu/ganesh/mock/GrMockGpu.cpp
+    ${SKIA_SRC_DIR}/gpu/ganesh/mock/GrMockCaps.cpp
+    ${SKIA_SRC_DIR}/gpu/ganesh/mock/GrMockTypes.cpp
+    ${SKIA_SRC_DIR}/gpu/ganesh/image/GrTextureGenerator.cpp
+    ${SKIA_SRC_DIR}/gpu/ganesh/image/GrImageUtils.cpp
+    ${SKIA_SRC_DIR}/gpu/ganesh/image/SkSpecialImage_Ganesh.cpp
+    ${SKIA_SRC_DIR}/gpu/ganesh/image/SkImage_RasterPinnable.cpp
+    ${SKIA_SRC_DIR}/core/SkSpecialImage.cpp
+    ${SKIA_SRC_DIR}/core/SkCPURecorder.cpp
+    ${SKIA_SRC_DIR}/core/SkCPUContext.cpp
+    ${SKIA_SRC_DIR}/core/SkMasks.cpp
+    ${SKIA_SRC_DIR}/codec/SkGainmapInfo.cpp
+    ${SKIA_SRC_DIR}/codec/SkImageGenerator_FromEncoded.cpp
+    ${SKIA_SRC_DIR}/codec/SkEncodedInfo.cpp
+    ${SKIA_SRC_DIR}/codec/SkCodec.cpp
+    ${SKIA_SRC_DIR}/codec/SkColorPalette.cpp
+    ${SKIA_SRC_DIR}/codec/SkSwizzler.cpp
+    ${SKIA_SRC_DIR}/codec/SkMaskSwizzler.cpp
+    ${SKIA_SRC_DIR}/codec/SkPngCodec.cpp
+    ${SKIA_SRC_DIR}/codec/SkPngCodecBase.cpp
+    ${SKIA_SRC_DIR}/codec/SkPngCompositeChunkReader.cpp
+    ${SKIA_SRC_DIR}/codec/SkBmpCodec.cpp
+    ${SKIA_SRC_DIR}/codec/SkBmpBaseCodec.cpp
+    ${SKIA_SRC_DIR}/codec/SkBmpMaskCodec.cpp
+    ${SKIA_SRC_DIR}/codec/SkBmpRLECodec.cpp
+    ${SKIA_SRC_DIR}/codec/SkBmpStandardCodec.cpp
+    ${SKIA_SRC_DIR}/codec/SkWbmpCodec.cpp
+    ${SKIA_SRC_DIR}/codec/SkCodecImageGenerator.cpp
+    ${SKIA_SRC_DIR}/codec/SkPixmapUtils.cpp
+    ${SKIA_SRC_DIR}/codec/SkSampler.cpp
+    ${SKIA_SRC_DIR}/gpu/ganesh/image/SkImage_LazyTexture.cpp
+    ${SKIA_SRC_DIR}/gpu/ganesh/effects/GrShadowGeoProc.cpp
+    ${SKIA_SRC_DIR}/gpu/ganesh/gradients/GrGradientShader.cpp
+    ${SKIA_SRC_DIR}/gpu/ganesh/gradients/GrGradientBitmapCache.cpp
     # 路径渲染器
     ${SKIA_SRC_DIR}/gpu/ganesh/ops/TessellationPathRenderer.cpp
     ${SKIA_SRC_DIR}/gpu/ganesh/ops/TriangulatingPathRenderer.cpp
@@ -973,8 +1021,38 @@ set(gpu_SOURCES
     ${SKIA_SRC_DIR}/gpu/ganesh/ops/PathStencilCoverOp.cpp
     ${SKIA_SRC_DIR}/gpu/ganesh/ops/PathInnerTriangulateOp.cpp
     ${SKIA_SRC_DIR}/gpu/ganesh/ops/AtlasPathRenderer.cpp
+    ${SKIA_SRC_DIR}/gpu/ganesh/ops/AtlasRenderTask.cpp
+    ${SKIA_SRC_DIR}/gpu/ganesh/ops/DrawAtlasPathOp.cpp
     ${SKIA_SRC_DIR}/gpu/ganesh/ops/DashLinePathRenderer.cpp
+    ${SKIA_SRC_DIR}/gpu/ganesh/ops/DashOp.cpp
     ${SKIA_SRC_DIR}/gpu/ganesh/ops/SmallPathRenderer.cpp
+    ${SKIA_SRC_DIR}/gpu/ganesh/ops/SmallPathAtlasMgr.cpp
+    ${SKIA_SRC_DIR}/gpu/ganesh/ops/SmallPathShapeData.cpp
+    ${SKIA_SRC_DIR}/gpu/ganesh/ops/OpsTask.cpp
+    ${SKIA_SRC_DIR}/gpu/ganesh/ops/AtlasInstancedHelper.cpp
+    ${SKIA_SRC_DIR}/gpu/ganesh/ops/TextureOp.cpp
+    ${SKIA_SRC_DIR}/gpu/ganesh/ops/AAConvexPathRenderer.cpp
+    ${SKIA_SRC_DIR}/gpu/ganesh/ops/AAHairLinePathRenderer.cpp
+    ${SKIA_SRC_DIR}/gpu/ganesh/ops/AALinearizingConvexPathRenderer.cpp
+    ${SKIA_SRC_DIR}/gpu/ganesh/ops/DefaultPathRenderer.cpp
+    ${SKIA_SRC_DIR}/gpu/ganesh/ops/FillRectOp.cpp
+    ${SKIA_SRC_DIR}/gpu/ganesh/ops/FillRRectOp.cpp
+    ${SKIA_SRC_DIR}/gpu/ganesh/ops/DrawMeshOp.cpp
+    ${SKIA_SRC_DIR}/gpu/ganesh/ops/QuadPerEdgeAA.cpp
+    ${SKIA_SRC_DIR}/gpu/ganesh/ops/RegionOp.cpp
+    ${SKIA_SRC_DIR}/gpu/ganesh/ops/ShadowRRectOp.cpp
+    ${SKIA_SRC_DIR}/gpu/ganesh/ops/StrokeRectOp.cpp
+    ${SKIA_SRC_DIR}/gpu/ganesh/ops/GrOvalOpFactory.cpp
+    ${SKIA_SRC_DIR}/gpu/ganesh/ops/LatticeOp.cpp
+    ${SKIA_SRC_DIR}/gpu/ganesh/ops/ClearOp.cpp
+    ${SKIA_SRC_DIR}/gpu/ganesh/ops/DrawableOp.cpp
+    ${SKIA_SRC_DIR}/gpu/ganesh/ops/DrawAtlasOp.cpp
+    ${SKIA_SRC_DIR}/gpu/ganesh/ops/AtlasTextOp.cpp
+    ${SKIA_SRC_DIR}/gpu/ganesh/ops/SoftwarePathRenderer.cpp
+    ${SKIA_SRC_DIR}/text/gpu/VertexFiller.cpp
+    ${SKIA_SRC_DIR}/text/gpu/GlyphVector.cpp
+    ${SKIA_SRC_DIR}/gpu/ganesh/text/GrAtlasManager.cpp
+    ${SKIA_SRC_DIR}/gpu/ganesh/text/GaneshVertexFiller.cpp
     # 路径渲染器链
     ${SKIA_SRC_DIR}/gpu/ganesh/PathRendererChain.cpp
     # 网格绘制辅助类
@@ -987,6 +1065,10 @@ set(gpu_SOURCES
     ${SKIA_SRC_DIR}/gpu/ganesh/geometry/GrAATriangulator.cpp
     ${SKIA_SRC_DIR}/gpu/ganesh/geometry/GrPathUtils.cpp
     ${SKIA_SRC_DIR}/gpu/ganesh/geometry/GrStyledShape.cpp
+    ${SKIA_SRC_DIR}/gpu/ganesh/geometry/GrShape.cpp
+    ${SKIA_SRC_DIR}/gpu/ganesh/geometry/GrAAConvexTessellator.cpp
+    ${SKIA_SRC_DIR}/gpu/ganesh/geometry/GrQuadUtils.cpp
+    ${SKIA_SRC_DIR}/gpu/ganesh/geometry/GrQuad.cpp
     # 曲面细分相关文件
     ${SKIA_SRC_DIR}/gpu/ganesh/tessellate/GrTessellationShader.cpp
     ${SKIA_SRC_DIR}/gpu/ganesh/tessellate/GrStrokeTessellationShader.cpp
@@ -999,6 +1081,13 @@ set(gpu_SOURCES
     # Windows OpenGL (WGL) 后端
     ${SKIA_SRC_DIR}/gpu/ganesh/gl/win/GrGLMakeNativeInterface_win.cpp
     ${SKIA_SRC_DIR}/gpu/ganesh/gl/win/GrGLMakeWinInterface.cpp
+    # Surface相关文件
+    ${SKIA_SRC_DIR}/gpu/ganesh/surface/SkSurface_Ganesh.cpp
+    # Image相关文件
+    ${SKIA_SRC_DIR}/gpu/ganesh/image/SkImage_Ganesh.cpp
+    ${SKIA_SRC_DIR}/gpu/ganesh/image/SkImage_GaneshBase.cpp
+    ${SKIA_SRC_DIR}/gpu/ganesh/image/SkImage_GaneshFactories.cpp
+    ${SKIA_SRC_DIR}/gpu/ganesh/image/SkImage_GaneshYUVA.cpp
     # OpenGL 程序构建器
     ${SKIA_SRC_DIR}/gpu/ganesh/gl/builders/GrGLProgramBuilder.cpp
     # Direct3D 后端（暂时禁用，存在编译错误）
@@ -1366,5 +1455,11 @@ install(DIRECTORY ${SKIA_ROOT_DIR}/modules/skcms/
     DESTINATION include/modules/skcms
     FILES_MATCHING
     PATTERN "*.h"
-    PATTERN "src" EXCLUDE
+)
+
+# 安装 skcms 模块源代码目录（包含 skcms_public.h）
+install(DIRECTORY ${SKIA_ROOT_DIR}/modules/skcms/src/
+    DESTINATION include/modules/skcms/src
+    FILES_MATCHING
+    PATTERN "*.h"
 )
