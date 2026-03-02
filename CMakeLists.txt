@@ -1351,44 +1351,44 @@ set(sfnt_SOURCES
 )
 
 # 添加 Harfbuzz 头文件路径
-include_directories("${SKIA_SOURCE_DIR}/third_party/externals/harfbuzz/src")
-include_directories("${SKIA_SOURCE_DIR}/third_party/harfbuzz")
+include_directories("${SKIA_ROOT_DIR}/third_party/externals/harfbuzz/src")
+include_directories("${SKIA_ROOT_DIR}/third_party/harfbuzz")
 
 # 添加 Harfbuzz 源文件
 set(HARFBUZZ_SOURCES
-    "${SKIA_SOURCE_DIR}/third_party/externals/harfbuzz/src/harfbuzz.cc"
+    "${SKIA_ROOT_DIR}/third_party/externals/harfbuzz/src/harfbuzz.cc"
 )
 
 # 添加 SkParagraph、SkShaper、SkUnicode 模块的源文件
 set(SKPARAGRAPH_SOURCES
-    "${SKIA_SOURCE_DIR}/modules/skparagraph/src/Decorations.cpp"
-    "${SKIA_SOURCE_DIR}/modules/skparagraph/src/FontArguments.cpp"
-    "${SKIA_SOURCE_DIR}/modules/skparagraph/src/FontCollection.cpp"
-    "${SKIA_SOURCE_DIR}/modules/skparagraph/src/OneLineShaper.cpp"
-    "${SKIA_SOURCE_DIR}/modules/skparagraph/src/ParagraphBuilderImpl.cpp"
-    "${SKIA_SOURCE_DIR}/modules/skparagraph/src/ParagraphCache.cpp"
-    "${SKIA_SOURCE_DIR}/modules/skparagraph/src/ParagraphImpl.cpp"
-    "${SKIA_SOURCE_DIR}/modules/skparagraph/src/ParagraphPainterImpl.cpp"
-    "${SKIA_SOURCE_DIR}/modules/skparagraph/src/ParagraphStyle.cpp"
-    "${SKIA_SOURCE_DIR}/modules/skparagraph/src/Run.cpp"
-    "${SKIA_SOURCE_DIR}/modules/skparagraph/src/TextLine.cpp"
-    "${SKIA_SOURCE_DIR}/modules/skparagraph/src/TextShadow.cpp"
-    "${SKIA_SOURCE_DIR}/modules/skparagraph/src/TextStyle.cpp"
-    "${SKIA_SOURCE_DIR}/modules/skparagraph/src/TextWrapper.cpp"
-    "${SKIA_SOURCE_DIR}/modules/skparagraph/src/TypefaceFontProvider.cpp"
+    "${SKIA_ROOT_DIR}/modules/skparagraph/src/Decorations.cpp"
+    "${SKIA_ROOT_DIR}/modules/skparagraph/src/FontArguments.cpp"
+    "${SKIA_ROOT_DIR}/modules/skparagraph/src/FontCollection.cpp"
+    "${SKIA_ROOT_DIR}/modules/skparagraph/src/OneLineShaper.cpp"
+    "${SKIA_ROOT_DIR}/modules/skparagraph/src/ParagraphBuilderImpl.cpp"
+    "${SKIA_ROOT_DIR}/modules/skparagraph/src/ParagraphCache.cpp"
+    "${SKIA_ROOT_DIR}/modules/skparagraph/src/ParagraphImpl.cpp"
+    "${SKIA_ROOT_DIR}/modules/skparagraph/src/ParagraphPainterImpl.cpp"
+    "${SKIA_ROOT_DIR}/modules/skparagraph/src/ParagraphStyle.cpp"
+    "${SKIA_ROOT_DIR}/modules/skparagraph/src/Run.cpp"
+    "${SKIA_ROOT_DIR}/modules/skparagraph/src/TextLine.cpp"
+    "${SKIA_ROOT_DIR}/modules/skparagraph/src/TextShadow.cpp"
+    "${SKIA_ROOT_DIR}/modules/skparagraph/src/TextStyle.cpp"
+    "${SKIA_ROOT_DIR}/modules/skparagraph/src/TextWrapper.cpp"
+    "${SKIA_ROOT_DIR}/modules/skparagraph/src/TypefaceFontProvider.cpp"
 )
 
 set(SKSHAPER_SOURCES
-    "${SKIA_SOURCE_DIR}/modules/skshaper/src/SkShaper.cpp"
-    "${SKIA_SOURCE_DIR}/modules/skshaper/src/SkShaper_factory.cpp"
-    "${SKIA_SOURCE_DIR}/modules/skshaper/src/SkShaper_primitive.cpp"
-    "${SKIA_SOURCE_DIR}/modules/skshaper/src/SkShaper_harfbuzz.cpp"
-    "${SKIA_SOURCE_DIR}/modules/skshaper/src/SkShaper_skunicode.cpp"
+    "${SKIA_ROOT_DIR}/modules/skshaper/src/SkShaper.cpp"
+    "${SKIA_ROOT_DIR}/modules/skshaper/src/SkShaper_factory.cpp"
+    "${SKIA_ROOT_DIR}/modules/skshaper/src/SkShaper_primitive.cpp"
+    "${SKIA_ROOT_DIR}/modules/skshaper/src/SkShaper_harfbuzz.cpp"
+    "${SKIA_ROOT_DIR}/modules/skshaper/src/SkShaper_skunicode.cpp"
 )
 
 set(SKUNICODE_SOURCES
-    "${SKIA_SOURCE_DIR}/modules/skunicode/src/SkUnicode.cpp"
-    "${SKIA_SOURCE_DIR}/modules/skunicode/src/SkUnicode_hardcoded.cpp"
+    "${SKIA_ROOT_DIR}/modules/skunicode/src/SkUnicode.cpp"
+    "${SKIA_ROOT_DIR}/modules/skunicode/src/SkUnicode_hardcoded.cpp"
 )
 
 # 创建 Skia 库（包含 GPU 渲染模块）
@@ -1439,6 +1439,7 @@ if(MSVC)
         /wd4201
         /wd4127
         /wd4100
+        /bigobj  # 添加这个选项
     )
     target_compile_definitions(skia PUBLIC 
         SK_DIRECT3D
