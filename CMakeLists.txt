@@ -7,6 +7,12 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+# 定义必要的宏
+add_definitions(-DSK_SHAPER_HARFBUZZ_AVAILABLE)
+add_definitions(-DSK_SHAPER_UNICODE_AVAILABLE)
+# 不使用 ICU，使用硬编码实现
+add_definitions(-DSK_UNICODE_ICU_IMPLEMENTATION)
+
 # 设置 CMake 变量
 set(SKIA_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set(SKIA_SRC_DIR ${SKIA_ROOT_DIR}/src)
@@ -1344,6 +1350,47 @@ set(sfnt_SOURCES
     ${SKIA_SRC_DIR}/sfnt/SkOTTable_name.cpp
 )
 
+# 添加 Harfbuzz 头文件路径
+include_directories("${SKIA_SOURCE_DIR}/third_party/externals/harfbuzz/src")
+include_directories("${SKIA_SOURCE_DIR}/third_party/harfbuzz")
+
+# 添加 Harfbuzz 源文件
+set(HARFBUZZ_SOURCES
+    "${SKIA_SOURCE_DIR}/third_party/externals/harfbuzz/src/harfbuzz.cc"
+)
+
+# 添加 SkParagraph、SkShaper、SkUnicode 模块的源文件
+set(SKPARAGRAPH_SOURCES
+    "${SKIA_SOURCE_DIR}/modules/skparagraph/src/Decorations.cpp"
+    "${SKIA_SOURCE_DIR}/modules/skparagraph/src/FontArguments.cpp"
+    "${SKIA_SOURCE_DIR}/modules/skparagraph/src/FontCollection.cpp"
+    "${SKIA_SOURCE_DIR}/modules/skparagraph/src/OneLineShaper.cpp"
+    "${SKIA_SOURCE_DIR}/modules/skparagraph/src/ParagraphBuilderImpl.cpp"
+    "${SKIA_SOURCE_DIR}/modules/skparagraph/src/ParagraphCache.cpp"
+    "${SKIA_SOURCE_DIR}/modules/skparagraph/src/ParagraphImpl.cpp"
+    "${SKIA_SOURCE_DIR}/modules/skparagraph/src/ParagraphPainterImpl.cpp"
+    "${SKIA_SOURCE_DIR}/modules/skparagraph/src/ParagraphStyle.cpp"
+    "${SKIA_SOURCE_DIR}/modules/skparagraph/src/Run.cpp"
+    "${SKIA_SOURCE_DIR}/modules/skparagraph/src/TextLine.cpp"
+    "${SKIA_SOURCE_DIR}/modules/skparagraph/src/TextShadow.cpp"
+    "${SKIA_SOURCE_DIR}/modules/skparagraph/src/TextStyle.cpp"
+    "${SKIA_SOURCE_DIR}/modules/skparagraph/src/TextWrapper.cpp"
+    "${SKIA_SOURCE_DIR}/modules/skparagraph/src/TypefaceFontProvider.cpp"
+)
+
+set(SKSHAPER_SOURCES
+    "${SKIA_SOURCE_DIR}/modules/skshaper/src/SkShaper.cpp"
+    "${SKIA_SOURCE_DIR}/modules/skshaper/src/SkShaper_factory.cpp"
+    "${SKIA_SOURCE_DIR}/modules/skshaper/src/SkShaper_primitive.cpp"
+    "${SKIA_SOURCE_DIR}/modules/skshaper/src/SkShaper_harfbuzz.cpp"
+    "${SKIA_SOURCE_DIR}/modules/skshaper/src/SkShaper_skunicode.cpp"
+)
+
+set(SKUNICODE_SOURCES
+    "${SKIA_SOURCE_DIR}/modules/skunicode/src/SkUnicode.cpp"
+    "${SKIA_SOURCE_DIR}/modules/skunicode/src/SkUnicode_hardcoded.cpp"
+)
+
 # 创建 Skia 库（包含 GPU 渲染模块）
 add_library(skia STATIC
     ${base_SOURCES}
@@ -1361,6 +1408,10 @@ add_library(skia STATIC
     ${image_SOURCES}
     ${encode_SOURCES}
     ${sksl_SOURCES}
+    ${HARFBUZZ_SOURCES}
+    ${SKPARAGRAPH_SOURCES}
+    ${SKSHAPER_SOURCES}
+    ${SKUNICODE_SOURCES}
 )
 
 # 为 SkOTTable_name.cpp 禁用重复 case 值警告/错误
