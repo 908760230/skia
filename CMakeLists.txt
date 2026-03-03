@@ -25,6 +25,12 @@ include_directories(${SKIA_SRC_DIR}/gpu)
 include_directories(${SKIA_SRC_DIR}/gpu/ganesh)
 include_directories(${SKIA_ROOT_DIR}/modules/skcms)
 include_directories(${SKIA_ROOT_DIR}/third_party/externals/d3d12allocator/src)
+# 添加第三方库 include 目录
+include_directories(${SKIA_ROOT_DIR}/third_party/externals/libpng)
+include_directories(${SKIA_ROOT_DIR}/third_party/libpng)
+include_directories(${SKIA_ROOT_DIR}/third_party/externals/libjpeg-turbo)
+include_directories(${SKIA_ROOT_DIR}/third_party/externals/libjpeg-turbo/src)
+include_directories(${SKIA_ROOT_DIR}/third_party/externals/zlib)
 
 # 收集头文件
 file(GLOB_RECURSE base_HEADERS
@@ -1359,6 +1365,44 @@ set(HARFBUZZ_SOURCES
     "${SKIA_ROOT_DIR}/third_party/externals/harfbuzz/src/harfbuzz.cc"
 )
 
+# 添加 libpng 源文件
+set(LIBPNG_SOURCES
+    "${SKIA_ROOT_DIR}/third_party/externals/libpng/png.c"
+    "${SKIA_ROOT_DIR}/third_party/externals/libpng/pngerror.c"
+    "${SKIA_ROOT_DIR}/third_party/externals/libpng/pngget.c"
+    "${SKIA_ROOT_DIR}/third_party/externals/libpng/pngmem.c"
+    "${SKIA_ROOT_DIR}/third_party/externals/libpng/pngpread.c"
+    "${SKIA_ROOT_DIR}/third_party/externals/libpng/pngread.c"
+    "${SKIA_ROOT_DIR}/third_party/externals/libpng/pngrio.c"
+    "${SKIA_ROOT_DIR}/third_party/externals/libpng/pngrtran.c"
+    "${SKIA_ROOT_DIR}/third_party/externals/libpng/pngrutil.c"
+    "${SKIA_ROOT_DIR}/third_party/externals/libpng/pngset.c"
+    "${SKIA_ROOT_DIR}/third_party/externals/libpng/pngtrans.c"
+    "${SKIA_ROOT_DIR}/third_party/externals/libpng/pngwio.c"
+    "${SKIA_ROOT_DIR}/third_party/externals/libpng/pngwrite.c"
+    "${SKIA_ROOT_DIR}/third_party/externals/libpng/pngwtran.c"
+    "${SKIA_ROOT_DIR}/third_party/externals/libpng/pngwutil.c"
+)
+
+# 添加 zlib 源文件
+set(ZLIB_SOURCES
+    "${SKIA_ROOT_DIR}/third_party/externals/zlib/adler32.c"
+    "${SKIA_ROOT_DIR}/third_party/externals/zlib/compress.c"
+    "${SKIA_ROOT_DIR}/third_party/externals/zlib/crc32.c"
+    "${SKIA_ROOT_DIR}/third_party/externals/zlib/deflate.c"
+    "${SKIA_ROOT_DIR}/third_party/externals/zlib/gzclose.c"
+    "${SKIA_ROOT_DIR}/third_party/externals/zlib/gzlib.c"
+    "${SKIA_ROOT_DIR}/third_party/externals/zlib/gzread.c"
+    "${SKIA_ROOT_DIR}/third_party/externals/zlib/gzwrite.c"
+    "${SKIA_ROOT_DIR}/third_party/externals/zlib/infback.c"
+    "${SKIA_ROOT_DIR}/third_party/externals/zlib/inffast.c"
+    "${SKIA_ROOT_DIR}/third_party/externals/zlib/inflate.c"
+    "${SKIA_ROOT_DIR}/third_party/externals/zlib/inftrees.c"
+    "${SKIA_ROOT_DIR}/third_party/externals/zlib/trees.c"
+    "${SKIA_ROOT_DIR}/third_party/externals/zlib/uncompr.c"
+    "${SKIA_ROOT_DIR}/third_party/externals/zlib/zutil.c"
+)
+
 # 添加 SkParagraph、SkShaper、SkUnicode 模块的源文件
 set(SKPARAGRAPH_SOURCES
     "${SKIA_ROOT_DIR}/modules/skparagraph/src/Decorations.cpp"
@@ -1412,6 +1456,8 @@ add_library(skia STATIC
     ${SKPARAGRAPH_SOURCES}
     ${SKSHAPER_SOURCES}
     ${SKUNICODE_SOURCES}
+    ${LIBPNG_SOURCES}
+    ${ZLIB_SOURCES}
 )
 
 # 为 SkOTTable_name.cpp 禁用重复 case 值警告/错误
