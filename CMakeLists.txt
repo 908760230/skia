@@ -7,12 +7,26 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+# 在 Windows 上使用动态运行时库
+if(WIN32)
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
+endif()
+
 # 定义必要的宏
 add_definitions(-DSK_SHAPER_HARFBUZZ_AVAILABLE)
 add_definitions(-DSK_SHAPER_UNICODE_AVAILABLE)
 add_definitions(-DSK_UNICODE_ICU_IMPLEMENTATION)
 add_definitions(-DSK_USING_THIRD_PARTY_ICU)
 add_definitions(-DSKUNICODE_IMPLEMENTATION=1)
+# ICU 静态链接宏定义
+add_definitions(-DU_STATIC_IMPLEMENTATION)
+add_definitions(-DU_COMMON_IMPLEMENTATION)
+add_definitions(-DU_I18N_IMPLEMENTATION)
+add_definitions(-DU_ENABLE_DYLOAD=0)
+add_definitions(-DU_DISABLE_RENAMING=1)
+add_definitions(-DU_USING_ICU_NAMESPACE=0)
+add_definitions(-D_XOPEN_SOURCE=0)
+add_definitions(-DU_NOEXCEPT=)
 
 # 设置 CMake 变量
 set(SKIA_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR})
@@ -1534,7 +1548,7 @@ if(MSVC)
         SK_GL
     )
     # 链接 OpenGL 和 Direct3D 库
-    target_link_libraries(skia PRIVATE opengl32 d3d12 dxgi)
+    target_link_libraries(skia PRIVATE opengl32 d3d12 dxgi user32 gdi32 advapi32 shell32 ole32 oleaut32 uuid)
 else()
     target_compile_options(skia PRIVATE
         -Wall
