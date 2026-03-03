@@ -10,8 +10,9 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # 定义必要的宏
 add_definitions(-DSK_SHAPER_HARFBUZZ_AVAILABLE)
 add_definitions(-DSK_SHAPER_UNICODE_AVAILABLE)
-# 不使用 ICU，使用硬编码实现
 add_definitions(-DSK_UNICODE_ICU_IMPLEMENTATION)
+add_definitions(-DSK_USING_THIRD_PARTY_ICU)
+add_definitions(-DSKUNICODE_IMPLEMENTATION=1)
 
 # 设置 CMake 变量
 set(SKIA_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR})
@@ -31,6 +32,10 @@ include_directories(${SKIA_ROOT_DIR}/third_party/libpng)
 include_directories(${SKIA_ROOT_DIR}/third_party/externals/libjpeg-turbo)
 include_directories(${SKIA_ROOT_DIR}/third_party/externals/libjpeg-turbo/src)
 include_directories(${SKIA_ROOT_DIR}/third_party/externals/zlib)
+# 添加 ICU include 目录
+include_directories(${SKIA_ROOT_DIR}/third_party/externals/icu/source/common)
+include_directories(${SKIA_ROOT_DIR}/third_party/externals/icu/source/i18n)
+include_directories(${SKIA_ROOT_DIR}/third_party/icu)
 
 # 收集头文件
 file(GLOB_RECURSE base_HEADERS
@@ -1430,9 +1435,31 @@ set(SKSHAPER_SOURCES
     "${SKIA_ROOT_DIR}/modules/skshaper/src/SkShaper_skunicode.cpp"
 )
 
+# 使用 GLOB_RECURSE 自动收集 ICU 源文件（仅 .cpp 文件）
+file(GLOB_RECURSE ICU_COMMON_SOURCES
+    "${SKIA_ROOT_DIR}/third_party/externals/icu/source/common/*.cpp"
+)
+file(GLOB_RECURSE ICU_I18N_SOURCES
+    "${SKIA_ROOT_DIR}/third_party/externals/icu/source/i18n/*.cpp"
+)
+set(ICU_SOURCES ${ICU_COMMON_SOURCES} ${ICU_I18N_SOURCES})
+
+# 添加 ICU 数据文件（转换后的 C++ 源文件）
+set(ICU_DATA_SOURCES
+    "${SKIA_ROOT_DIR}/build/icudtl_dat.cpp"
+)
+
+# 添加 SkLoadICU.cpp（Windows 平台加载 ICU 数据）
+set(ICU_LOAD_SOURCES
+    "${SKIA_ROOT_DIR}/third_party/icu/SkLoadICU.cpp"
+)
+
 set(SKUNICODE_SOURCES
     "${SKIA_ROOT_DIR}/modules/skunicode/src/SkUnicode.cpp"
-    "${SKIA_ROOT_DIR}/modules/skunicode/src/SkUnicode_hardcoded.cpp"
+    "${SKIA_ROOT_DIR}/modules/skunicode/src/SkUnicode_icu.cpp"
+    "${SKIA_ROOT_DIR}/modules/skunicode/src/SkUnicode_icu_bidi.cpp"
+    "${SKIA_ROOT_DIR}/modules/skunicode/src/SkUnicode_icu_builtin.cpp"
+    "${SKIA_ROOT_DIR}/modules/skunicode/src/SkBidiFactory_icu_full.cpp"
 )
 
 # 创建 Skia 库（包含 GPU 渲染模块）
@@ -1456,9 +1483,24 @@ add_library(skia STATIC
     ${SKPARAGRAPH_SOURCES}
     ${SKSHAPER_SOURCES}
     ${SKUNICODE_SOURCES}
+    ${ICU_SOURCES}
+    ${ICU_DATA_SOURCES}
+    ${ICU_LOAD_SOURCES}
     ${LIBPNG_SOURCES}
     ${ZLIB_SOURCES}
 )
+
+# 为 ICU 源文件设置特定的宏定义
+if(MSVC)
+    # ICU common 源文件宏定义
+    set_source_files_properties(${ICU_SOURCES} PROPERTIES
+        COMPILE_DEFINITIONS "U_COMMON_IMPLEMENTATION;U_STATIC_IMPLEMENTATION;U_ENABLE_DYLOAD=0;U_I18N_IMPLEMENTATION;U_DISABLE_RENAMING=1;U_USING_ICU_NAMESPACE=0;_XOPEN_SOURCE=0;U_NOEXCEPT="
+    )
+    # ICU 需要 RTTI 支持，所以为 ICU 源文件启用 RTTI
+    set_source_files_properties(${ICU_SOURCES} PROPERTIES
+        COMPILE_FLAGS "/GR"
+    )
+endif()
 
 # 为 SkOTTable_name.cpp 禁用重复 case 值警告/错误
 if(MSVC)
