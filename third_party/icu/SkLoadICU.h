@@ -7,10 +7,12 @@
 #ifndef load_icu_DEFINED
 #define load_icu_DEFINED
 
-#if defined(_WIN32) && defined(SK_USING_THIRD_PARTY_ICU)
+#if (defined(_WIN32) || defined(ANDROID)) && defined(SK_USING_THIRD_PARTY_ICU)
 bool SkLoadICU();
+void SkSetICUDataDirectory(const char* path);
 #else
 static inline bool SkLoadICU() { return true; }
+static inline void SkSetICUDataDirectory(const char*) {}
 #endif  // defined(_WIN32) && defined(SK_USING_THIRD_PARTY_ICU)
 
 #endif  // load_icu_DEFINED

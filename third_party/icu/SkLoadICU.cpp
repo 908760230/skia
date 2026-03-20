@@ -3,20 +3,21 @@
 
 #include "SkLoadICU.h"
 
-#if defined(_WIN32) && defined(SK_USING_THIRD_PARTY_ICU)
+#if (defined(_WIN32) || defined(ANDROID)) && defined(SK_USING_THIRD_PARTY_ICU)
 
+#include "unicode/putil.h"
+#include "unicode/udata.h"
+
+#include <cstdio>
+#include <mutex>
+#include <string>
+
+#if defined(_WIN32)
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
 #endif
 #include <windows.h>
 #include <io.h>
-
-#include <cstdio>
-#include <cstring>
-#include <mutex>
-#include <string>
-
-#include "unicode/udata.h"
 
 static void* win_mmap(const wchar_t* dataFile) {
     if (!dataFile) {
@@ -118,4 +119,43 @@ bool SkLoadICU() {
     return good;
 }
 
-#endif  // defined(_WIN32) && defined(SK_USING_THIRD_PARTY_ICU)
+void SkSetICUDataDirectory(const char* path) {
+    (void)path;
+}
+
+#else
+
+static std::mutex gICUDataMutex;
+static std::string gICUDataDirectory;
+
+void SkSetICUDataDirectory(const char* path) {
+    std::lock_guard<std::mutex> lock(gICUDataMutex);
+    gICUDataDirectory = path ? path : "";
+}
+
+bool SkLoadICU() {
+    static bool good = false;
+    static std::once_flag flag;
+    std::call_once(flag, []() {
+        std::lock_guard<std::mutex> lock(gICUDataMutex);
+        if (gICUDataDirectory.empty()) {
+            fprintf(stderr, "SkIcuLoader: ICU data directory not set.\n");
+            good = false;
+            return;
+        }
+        u_setDataDirectory(gICUDataDirectory.c_str());
+        UErrorCode err = U_ZERO_ERROR;
+        udata_setFileAccess(UDATA_FILES_FIRST, &err);
+        if (err != U_ZERO_ERROR) {
+            fprintf(stderr, "udata_setFileAccess() returned %d.\n", (int)err);
+            good = false;
+            return;
+        }
+        good = true;
+    });
+    return good;
+}
+
+#endif
+
+#endif  // (defined(_WIN32) || defined(ANDROID)) && defined(SK_USING_THIRD_PARTY_ICU)

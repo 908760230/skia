@@ -442,6 +442,11 @@ elseif(APPLE)
         ${SKIA_SRC_DIR}/ports/SkScalerContext_mac_ct.cpp
         ${SKIA_SRC_DIR}/ports/SkTypeface_mac_ct.cpp
     )
+elseif(ANDROID)
+    list(APPEND ports_SOURCES
+        ${SKIA_SRC_DIR}/ports/SkDebug_android.cpp
+        ${SKIA_SRC_DIR}/ports/SkOSFile_posix.cpp
+    )
 elseif(UNIX)
     list(APPEND ports_SOURCES
         ${SKIA_SRC_DIR}/ports/SkDebug_android.cpp
@@ -1109,9 +1114,6 @@ set(gpu_SOURCES
     # 曲面细分工具
     ${SKIA_SRC_DIR}/gpu/tessellate/FixedCountBufferUtils.cpp
     ${SKIA_SRC_DIR}/gpu/tessellate/Tessellation.cpp
-    # Windows OpenGL (WGL) 后端
-    ${SKIA_SRC_DIR}/gpu/ganesh/gl/win/GrGLMakeNativeInterface_win.cpp
-    ${SKIA_SRC_DIR}/gpu/ganesh/gl/win/GrGLMakeWinInterface.cpp
     # Surface相关文件
     ${SKIA_SRC_DIR}/gpu/ganesh/surface/SkSurface_Ganesh.cpp
     # Image相关文件
@@ -1148,6 +1150,13 @@ set(gpu_SOURCES
     # ${SKIA_SRC_DIR}/gpu/ganesh/d3d/GrD3DAMDMemoryAllocator.cpp
     ${gpu_HEADERS}
 )
+
+if(WIN32 AND SKIA_ENABLE_OPENGL)
+    list(APPEND gpu_SOURCES
+        ${SKIA_SRC_DIR}/gpu/ganesh/gl/win/GrGLMakeNativeInterface_win.cpp
+        ${SKIA_SRC_DIR}/gpu/ganesh/gl/win/GrGLMakeWinInterface.cpp
+    )
+endif()
 
 
 
@@ -1403,6 +1412,14 @@ set(LIBPNG_SOURCES
     "${SKIA_ROOT_DIR}/third_party/externals/libpng/pngwutil.c"
 )
 
+if(ANDROID AND (CMAKE_ANDROID_ARCH_ABI STREQUAL "arm64-v8a" OR CMAKE_ANDROID_ARCH_ABI STREQUAL "armeabi-v7a"))
+    list(APPEND LIBPNG_SOURCES
+        "${SKIA_ROOT_DIR}/third_party/externals/libpng/arm/arm_init.c"
+        "${SKIA_ROOT_DIR}/third_party/externals/libpng/arm/filter_neon_intrinsics.c"
+        "${SKIA_ROOT_DIR}/third_party/externals/libpng/arm/palette_neon_intrinsics.c"
+    )
+endif()
+
 # 添加 zlib 源文件
 set(ZLIB_SOURCES
     "${SKIA_ROOT_DIR}/third_party/externals/zlib/adler32.c"
@@ -1458,11 +1475,6 @@ file(GLOB_RECURSE ICU_I18N_SOURCES
 )
 set(ICU_SOURCES ${ICU_COMMON_SOURCES} ${ICU_I18N_SOURCES})
 
-# 添加 ICU 数据文件（转换后的 C++ 源文件）
-set(ICU_DATA_SOURCES
-    "${SKIA_ROOT_DIR}/build/icudtl_dat.cpp"
-)
-
 # 添加 SkLoadICU.cpp（Windows 平台加载 ICU 数据）
 set(ICU_LOAD_SOURCES
     "${SKIA_ROOT_DIR}/third_party/icu/SkLoadICU.cpp"
@@ -1498,7 +1510,6 @@ add_library(skia STATIC
     ${SKSHAPER_SOURCES}
     ${SKUNICODE_SOURCES}
     ${ICU_SOURCES}
-    ${ICU_DATA_SOURCES}
     ${ICU_LOAD_SOURCES}
     ${LIBPNG_SOURCES}
     ${ZLIB_SOURCES}
@@ -1557,8 +1568,17 @@ else()
         -fno-rtti
         -O3
         -Wno-unused-parameter
-        -Wno-constant-condition
     )
+    if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+        target_compile_options(skia PRIVATE -Wno-constant-conversion)
+    else()
+        target_compile_options(skia PRIVATE -Wno-constant-condition)
+    endif()
+endif()
+
+if(ANDROID)
+    # ICU 在 Android/clang 下会使用 dynamic_cast/typeid，不能禁用 RTTI。
+    target_compile_options(skia PRIVATE -frtti)
 endif()
 
 # 设置编译定义
@@ -1568,8 +1588,18 @@ target_compile_definitions(skia PRIVATE
     SK_GAMMA_APPLY_TO_A8
     SK_GPU_ENABLED
     SK_GANESH_ENABLED
-    SK_GL
 )
+
+if(ANDROID AND (CMAKE_ANDROID_ARCH_ABI STREQUAL "arm64-v8a" OR CMAKE_ANDROID_ARCH_ABI STREQUAL "armeabi-v7a"))
+    target_compile_definitions(skia PRIVATE
+        PNG_ARM_NEON_OPT=2
+        PNG_ALIGNED_MEMORY_SUPPORTED
+    )
+endif()
+
+if(SKIA_ENABLE_OPENGL)
+    target_compile_definitions(skia PRIVATE SK_GL)
+endif()
 
 # 设置平台特定的编译定义
 if(WIN32)
@@ -1588,6 +1618,15 @@ elseif(UNIX)
     target_compile_definitions(skia PRIVATE
         SK_BUILD_FOR_UNIX
         SK_LINUX
+        SK_R32_SHIFT=16
+    )
+endif()
+
+if(ANDROID)
+    target_compile_definitions(skia PRIVATE
+        SK_BUILD_FOR_ANDROID
+        SK_ANDROID
+        SK_BUILD_FOR_UNIX
         SK_R32_SHIFT=16
     )
 endif()
