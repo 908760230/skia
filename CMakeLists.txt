@@ -1579,6 +1579,11 @@ endif()
 if(ANDROID)
     # ICU 在 Android/clang 下会使用 dynamic_cast/typeid，不能禁用 RTTI。
     target_compile_options(skia PRIVATE -frtti)
+endif()
+
+if(WIN32 OR ANDROID)
+    # Windows/Android 都直接从外部 icudtl.dat 加载 ICU 数据，
+    # 避免链接到内嵌的 icudtXX_dat 符号。
     target_compile_definitions(skia PRIVATE SKIA_USE_EXTERNAL_ICU_DATA=1)
 endif()
 
