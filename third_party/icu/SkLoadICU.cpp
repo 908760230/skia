@@ -145,7 +145,7 @@ bool SkLoadICU() {
         }
         u_setDataDirectory(gICUDataDirectory.c_str());
         UErrorCode err = U_ZERO_ERROR;
-        udata_setFileAccess(UDATA_FILES_FIRST, &err);
+        udata_setFileAccess(UDATA_ONLY_PACKAGES, &err);
         if (err != U_ZERO_ERROR) {
             fprintf(stderr, "udata_setFileAccess() returned %d.\n", (int)err);
             good = false;

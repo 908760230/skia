@@ -1579,6 +1579,7 @@ endif()
 if(ANDROID)
     # ICU 在 Android/clang 下会使用 dynamic_cast/typeid，不能禁用 RTTI。
     target_compile_options(skia PRIVATE -frtti)
+    target_compile_definitions(skia PRIVATE SKIA_USE_EXTERNAL_ICU_DATA=1)
 endif()
 
 # 设置编译定义
