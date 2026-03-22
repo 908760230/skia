@@ -7,6 +7,16 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+option(SKIA_ENABLE_GPU "Enable Skia GPU backends" ON)
+option(SKIA_ENABLE_OPENGL "Enable Skia Ganesh OpenGL backend" ON)
+option(SKIA_ENABLE_VULKAN "Enable Skia Ganesh Vulkan backend" OFF)
+option(SKIA_ENABLE_DIRECT3D "Enable Skia Ganesh Direct3D backend" OFF)
+option(SKIA_ENABLE_METAL "Enable Skia Ganesh Metal backend" OFF)
+
+if(APPLE AND SKIA_ENABLE_METAL)
+    enable_language(OBJCXX)
+endif()
+
 # 在 Windows 上使用动态运行时库
 if(WIN32)
     set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
@@ -46,6 +56,9 @@ include_directories(${SKIA_ROOT_DIR}/third_party/libpng)
 include_directories(${SKIA_ROOT_DIR}/third_party/externals/libjpeg-turbo)
 include_directories(${SKIA_ROOT_DIR}/third_party/externals/libjpeg-turbo/src)
 include_directories(${SKIA_ROOT_DIR}/third_party/externals/zlib)
+include_directories(${SKIA_ROOT_DIR}/third_party/externals/vulkan-headers/include)
+include_directories(${SKIA_ROOT_DIR}/third_party/externals/vulkanmemoryallocator/include)
+include_directories(${SKIA_ROOT_DIR}/third_party/externals/spirv-cross)
 # 添加 ICU include 目录
 include_directories(${SKIA_ROOT_DIR}/third_party/externals/icu/source/common)
 include_directories(${SKIA_ROOT_DIR}/third_party/externals/icu/source/i18n)
@@ -79,6 +92,60 @@ file(GLOB_RECURSE effects_HEADERS
 file(GLOB_RECURSE gpu_HEADERS
     ${SKIA_SRC_DIR}/gpu/*.h
     ${SKIA_INCLUDE_DIR}/gpu/*.h
+)
+
+file(GLOB SKIA_GPU_BACKEND_OPENGL_SOURCES
+    ${SKIA_SRC_DIR}/gpu/ganesh/gl/*.cpp
+    ${SKIA_SRC_DIR}/gpu/ganesh/gl/builders/*.cpp
+    ${SKIA_SRC_DIR}/gpu/ganesh/glsl/*.cpp
+)
+
+file(GLOB SKIA_GPU_BACKEND_VULKAN_SOURCES
+    ${SKIA_SRC_DIR}/gpu/ganesh/vk/*.cpp
+)
+if(NOT ANDROID)
+    list(REMOVE_ITEM SKIA_GPU_BACKEND_VULKAN_SOURCES
+        ${SKIA_SRC_DIR}/gpu/ganesh/vk/AHardwareBufferVk.cpp
+    )
+endif()
+
+set(SKIA_GPU_VULKAN_SUPPORT_SOURCES
+    ${SKIA_SRC_DIR}/gpu/vk/VulkanExtensions.cpp
+    ${SKIA_SRC_DIR}/gpu/vk/VulkanInterface.cpp
+    ${SKIA_SRC_DIR}/gpu/vk/VulkanMemory.cpp
+    ${SKIA_SRC_DIR}/gpu/vk/VulkanMutableTextureState.cpp
+    ${SKIA_SRC_DIR}/gpu/vk/VulkanPreferredFeatures.cpp
+    ${SKIA_SRC_DIR}/gpu/vk/VulkanUtilsPriv.cpp
+    ${SKIA_SRC_DIR}/gpu/vk/vulkanmemoryallocator/VulkanAMDMemoryAllocator.cpp
+    ${SKIA_SRC_DIR}/gpu/vk/vulkanmemoryallocator/VulkanMemoryAllocatorWrapper.cpp
+)
+
+file(GLOB SKIA_GPU_BACKEND_DIRECT3D_SOURCES
+    ${SKIA_SRC_DIR}/gpu/ganesh/d3d/*.cpp
+)
+
+set(SKIA_SPIRV_CROSS_SOURCES
+    ${SKIA_ROOT_DIR}/third_party/externals/spirv-cross/spirv_cfg.cpp
+    ${SKIA_ROOT_DIR}/third_party/externals/spirv-cross/spirv_cpp.cpp
+    ${SKIA_ROOT_DIR}/third_party/externals/spirv-cross/spirv_cross.cpp
+    ${SKIA_ROOT_DIR}/third_party/externals/spirv-cross/spirv_cross_parsed_ir.cpp
+    ${SKIA_ROOT_DIR}/third_party/externals/spirv-cross/spirv_cross_util.cpp
+    ${SKIA_ROOT_DIR}/third_party/externals/spirv-cross/spirv_glsl.cpp
+    ${SKIA_ROOT_DIR}/third_party/externals/spirv-cross/spirv_hlsl.cpp
+    ${SKIA_ROOT_DIR}/third_party/externals/spirv-cross/spirv_parser.cpp
+)
+
+list(APPEND SKIA_GPU_BACKEND_DIRECT3D_SOURCES
+    ${SKIA_ROOT_DIR}/third_party/externals/d3d12allocator/src/D3D12MemAlloc.cpp
+    ${SKIA_SRC_DIR}/sksl/codegen/SkSLHLSLCodeGenerator.cpp
+    ${SKIA_SRC_DIR}/sksl/codegen/SkSLSPIRVCodeGenerator.cpp
+    ${SKIA_SRC_DIR}/sksl/codegen/SkSLSPIRVtoHLSL.cpp
+    ${SKIA_SRC_DIR}/sksl/SkSLOutputStream.cpp
+    ${SKIA_SPIRV_CROSS_SOURCES}
+)
+
+file(GLOB SKIA_GPU_BACKEND_METAL_SOURCES
+    ${SKIA_SRC_DIR}/gpu/ganesh/mtl/*.mm
 )
 
 file(GLOB_RECURSE skcms_HEADERS
@@ -1158,6 +1225,31 @@ if(WIN32 AND SKIA_ENABLE_OPENGL)
     )
 endif()
 
+if(NOT SKIA_ENABLE_OPENGL)
+    list(REMOVE_ITEM gpu_SOURCES
+        ${SKIA_GPU_BACKEND_OPENGL_SOURCES}
+        ${SKIA_SRC_DIR}/gpu/ganesh/gl/win/GrGLMakeNativeInterface_win.cpp
+        ${SKIA_SRC_DIR}/gpu/ganesh/gl/win/GrGLMakeWinInterface.cpp
+    )
+endif()
+
+if(SKIA_ENABLE_VULKAN)
+    list(APPEND gpu_SOURCES
+        ${SKIA_GPU_BACKEND_VULKAN_SOURCES}
+        ${SKIA_GPU_VULKAN_SUPPORT_SOURCES}
+    )
+endif()
+
+if(WIN32 AND SKIA_ENABLE_DIRECT3D)
+    list(APPEND gpu_SOURCES ${SKIA_GPU_BACKEND_DIRECT3D_SOURCES})
+endif()
+
+if(APPLE AND SKIA_ENABLE_METAL)
+    list(APPEND gpu_SOURCES ${SKIA_GPU_BACKEND_METAL_SOURCES})
+endif()
+
+list(REMOVE_DUPLICATES gpu_SOURCES)
+
 
 
 # skcms 模块
@@ -1554,12 +1646,6 @@ if(MSVC)
         /wd4100
         /bigobj  # 添加这个选项
     )
-    target_compile_definitions(skia PUBLIC 
-        SK_DIRECT3D
-        SK_GL
-    )
-    # 链接 OpenGL 和 Direct3D 库
-    target_link_libraries(skia PRIVATE opengl32 d3d12 dxgi user32 gdi32 advapi32 shell32 ole32 oleaut32 uuid)
 else()
     target_compile_options(skia PRIVATE
         -Wall
@@ -1593,6 +1679,7 @@ target_compile_definitions(skia PRIVATE
     SK_CODEC_DECODES_WBMP
     SK_GAMMA_APPLY_TO_A8
     SK_GPU_ENABLED
+    SK_GANESH
     SK_GANESH_ENABLED
 )
 
@@ -1603,8 +1690,108 @@ if(ANDROID AND (CMAKE_ANDROID_ARCH_ABI STREQUAL "arm64-v8a" OR CMAKE_ANDROID_ARC
     )
 endif()
 
+set(SKIA_GPU_LINK_LIBS)
+
+if(WIN32)
+    if(SKIA_ENABLE_VULKAN)
+        find_library(SKIA_VULKAN_LIBRARY NAMES vulkan-1)
+        if(NOT SKIA_VULKAN_LIBRARY)
+            message(WARNING "SKIA_ENABLE_VULKAN=ON but Vulkan loader library was not found on Windows. Vulkan backend will be disabled for this build.")
+            set(SKIA_ENABLE_VULKAN OFF)
+            list(REMOVE_ITEM gpu_SOURCES
+                ${SKIA_GPU_BACKEND_VULKAN_SOURCES}
+                ${SKIA_GPU_VULKAN_SUPPORT_SOURCES}
+            )
+        endif()
+    endif()
+
+    list(APPEND SKIA_GPU_LINK_LIBS user32 gdi32 advapi32 shell32 ole32 oleaut32 uuid)
+    if(SKIA_ENABLE_OPENGL)
+        list(APPEND SKIA_GPU_LINK_LIBS opengl32)
+    endif()
+    if(SKIA_ENABLE_DIRECT3D)
+        list(APPEND SKIA_GPU_LINK_LIBS d3d12 dxgi dxguid d3dcompiler)
+    endif()
+    if(SKIA_ENABLE_VULKAN)
+        list(APPEND SKIA_GPU_LINK_LIBS ${SKIA_VULKAN_LIBRARY})
+    endif()
+elseif(APPLE)
+    if(SKIA_ENABLE_OPENGL)
+        find_library(SKIA_OPENGL_FRAMEWORK OpenGL)
+        if(SKIA_OPENGL_FRAMEWORK)
+            list(APPEND SKIA_GPU_LINK_LIBS ${SKIA_OPENGL_FRAMEWORK})
+        endif()
+    endif()
+    if(SKIA_ENABLE_METAL)
+        find_library(SKIA_METAL_FRAMEWORK Metal)
+        find_library(SKIA_QUARTZCORE_FRAMEWORK QuartzCore)
+        find_library(SKIA_FOUNDATION_FRAMEWORK Foundation)
+        list(APPEND SKIA_GPU_LINK_LIBS
+            ${SKIA_METAL_FRAMEWORK}
+            ${SKIA_QUARTZCORE_FRAMEWORK}
+            ${SKIA_FOUNDATION_FRAMEWORK}
+        )
+    endif()
+    if(SKIA_ENABLE_VULKAN)
+        find_library(SKIA_VULKAN_LIBRARY NAMES vulkan MoltenVK)
+        if(SKIA_VULKAN_LIBRARY)
+            list(APPEND SKIA_GPU_LINK_LIBS ${SKIA_VULKAN_LIBRARY})
+        else()
+            message(WARNING "SKIA_ENABLE_VULKAN=ON but Vulkan/MoltenVK library was not found on macOS.")
+        endif()
+    endif()
+elseif(ANDROID)
+    if(SKIA_ENABLE_OPENGL)
+        find_library(SKIA_ANDROID_GLES_LIB GLESv3)
+        if(SKIA_ANDROID_GLES_LIB)
+            list(APPEND SKIA_GPU_LINK_LIBS ${SKIA_ANDROID_GLES_LIB})
+        endif()
+    endif()
+    if(SKIA_ENABLE_VULKAN)
+        find_library(SKIA_ANDROID_VULKAN_LIB vulkan)
+        if(SKIA_ANDROID_VULKAN_LIB)
+            list(APPEND SKIA_GPU_LINK_LIBS ${SKIA_ANDROID_VULKAN_LIB})
+        else()
+            message(WARNING "SKIA_ENABLE_VULKAN=ON but Vulkan loader library was not found on Android.")
+        endif()
+    endif()
+elseif(UNIX)
+    if(SKIA_ENABLE_OPENGL)
+        find_package(OpenGL QUIET)
+        if(OpenGL_FOUND)
+            list(APPEND SKIA_GPU_LINK_LIBS OpenGL::GL)
+        else()
+            message(WARNING "SKIA_ENABLE_OPENGL=ON but OpenGL was not found.")
+        endif()
+    endif()
+    if(SKIA_ENABLE_VULKAN)
+        find_package(Vulkan QUIET)
+        if(Vulkan_FOUND)
+            list(APPEND SKIA_GPU_LINK_LIBS Vulkan::Vulkan)
+        else()
+            message(WARNING "SKIA_ENABLE_VULKAN=ON but Vulkan SDK was not found.")
+        endif()
+    endif()
+endif()
+
+if(SKIA_GPU_LINK_LIBS)
+    target_link_libraries(skia PRIVATE ${SKIA_GPU_LINK_LIBS})
+endif()
+
 if(SKIA_ENABLE_OPENGL)
     target_compile_definitions(skia PRIVATE SK_GL)
+endif()
+
+if(SKIA_ENABLE_VULKAN)
+    target_compile_definitions(skia PRIVATE SK_VULKAN)
+endif()
+
+if(SKIA_ENABLE_DIRECT3D)
+    target_compile_definitions(skia PRIVATE SK_DIRECT3D)
+endif()
+
+if(SKIA_ENABLE_METAL)
+    target_compile_definitions(skia PRIVATE SK_METAL)
 endif()
 
 # 设置平台特定的编译定义
