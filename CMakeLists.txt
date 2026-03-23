@@ -1799,6 +1799,7 @@ if(WIN32)
     target_compile_definitions(skia PUBLIC
         SK_BUILD_FOR_WIN32
         SK_WIN
+        ICU_DATA_DIR_WINDOWS
         _CRT_SECURE_NO_WARNINGS
         NOMINMAX
     )
