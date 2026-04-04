@@ -55,6 +55,9 @@ include_directories(${SKIA_ROOT_DIR}/third_party/externals/libpng)
 include_directories(${SKIA_ROOT_DIR}/third_party/libpng)
 include_directories(${SKIA_ROOT_DIR}/third_party/externals/libjpeg-turbo)
 include_directories(${SKIA_ROOT_DIR}/third_party/externals/libjpeg-turbo/src)
+include_directories(${SKIA_ROOT_DIR}/third_party/externals/libwebp)
+include_directories(${SKIA_ROOT_DIR}/third_party/externals/libwebp/src)
+include_directories(${SKIA_ROOT_DIR}/third_party/externals/wuffs/release/c)
 include_directories(${SKIA_ROOT_DIR}/third_party/externals/zlib)
 include_directories(${SKIA_ROOT_DIR}/third_party/externals/vulkan-headers/include)
 include_directories(${SKIA_ROOT_DIR}/third_party/externals/vulkanmemoryallocator/include)
@@ -385,7 +388,11 @@ set(core_SOURCES
 
 # 编解码模块
 set(codec_SOURCES
+    ${SKIA_SRC_DIR}/android/SkAnimatedImage.cpp
     ${SKIA_SRC_DIR}/codec/SkAndroidCodec.cpp
+    ${SKIA_SRC_DIR}/codec/SkAndroidCodecAdapter.cpp
+    ${SKIA_SRC_DIR}/codec/SkParseEncodedOrigin.cpp
+    ${SKIA_SRC_DIR}/codec/SkWuffsCodec.cpp
     ${SKIA_SRC_DIR}/codec/SkBmpBaseCodec.cpp
     ${SKIA_SRC_DIR}/codec/SkBmpCodec.cpp
     ${SKIA_SRC_DIR}/codec/SkBmpMaskCodec.cpp
@@ -1531,6 +1538,14 @@ set(ZLIB_SOURCES
     "${SKIA_ROOT_DIR}/third_party/externals/zlib/zutil.c"
 )
 
+set(LIBJPEG_TURBO_SOURCES)
+
+set(LIBWEBP_SOURCES)
+
+set(WUFFS_SOURCES
+    "${SKIA_ROOT_DIR}/third_party/externals/wuffs/release/c/wuffs-v0.3.c"
+)
+
 # 添加 SkParagraph、SkShaper、SkUnicode 模块的源文件
 set(SKPARAGRAPH_SOURCES
     "${SKIA_ROOT_DIR}/modules/skparagraph/src/Decorations.cpp"
@@ -1582,8 +1597,9 @@ set(SKUNICODE_SOURCES
 
 # 创建 Skia 库（包含 GPU 渲染模块）
 add_library(skia STATIC
-    ${base_SOURCES}
-    ${core_SOURCES}
+      ${base_SOURCES}
+      ${codec_SOURCES}
+      ${core_SOURCES}
     ${utils_SOURCES}
     ${ports_SOURCES}
     ${effects_SOURCES}
@@ -1604,7 +1620,14 @@ add_library(skia STATIC
     ${ICU_SOURCES}
     ${ICU_LOAD_SOURCES}
     ${LIBPNG_SOURCES}
+    ${LIBJPEG_TURBO_SOURCES}
+    ${LIBWEBP_SOURCES}
+    ${WUFFS_SOURCES}
     ${ZLIB_SOURCES}
+)
+
+set_source_files_properties(${WUFFS_SOURCES} PROPERTIES
+    COMPILE_DEFINITIONS "WUFFS_IMPLEMENTATION"
 )
 
 # 为 ICU 源文件设置特定的宏定义
@@ -1676,6 +1699,9 @@ endif()
 # 设置编译定义
 target_compile_definitions(skia PRIVATE
     SK_CODEC_DECODES_BMP
+    SK_CODEC_DECODES_GIF
+    SK_CODEC_DECODES_PNG
+    SK_CODEC_DECODES_PNG_WITH_LIBPNG
     SK_CODEC_DECODES_WBMP
     SK_GAMMA_APPLY_TO_A8
     SK_GPU_ENABLED
@@ -1799,7 +1825,6 @@ if(WIN32)
     target_compile_definitions(skia PUBLIC
         SK_BUILD_FOR_WIN32
         SK_WIN
-        ICU_DATA_DIR_WINDOWS
         _CRT_SECURE_NO_WARNINGS
         NOMINMAX
     )
