@@ -1582,10 +1582,18 @@ file(GLOB_RECURSE ICU_I18N_SOURCES
 )
 set(ICU_SOURCES ${ICU_COMMON_SOURCES} ${ICU_I18N_SOURCES})
 
-# 添加 SkLoadICU.cpp（Windows 平台加载 ICU 数据）
+# 添加 ICU 运行时加载相关源码。
+# Windows 仍需要 stubdata.cpp 提供 U_ICUDATA_ENTRY_POINT 占位符，
+# 真正的数据由 SkLoadICU.cpp 从 icudtl.dat 映射加载。
 set(ICU_LOAD_SOURCES
     "${SKIA_ROOT_DIR}/third_party/icu/SkLoadICU.cpp"
 )
+
+if(WIN32)
+    list(APPEND ICU_LOAD_SOURCES
+        "${SKIA_ROOT_DIR}/third_party/externals/icu/source/stubdata/stubdata.cpp"
+    )
+endif()
 
 set(JOT_ICU_COMPILE_DEFINITIONS
     "U_COMMON_IMPLEMENTATION;U_STATIC_IMPLEMENTATION;U_ENABLE_DYLOAD=0;U_I18N_IMPLEMENTATION;U_DISABLE_RENAMING=1;U_USING_ICU_NAMESPACE=0;_XOPEN_SOURCE=0;U_NOEXCEPT="
@@ -1705,8 +1713,8 @@ if(ANDROID)
 endif()
 
 if(WIN32 OR ANDROID)
-    # Windows/Android 都直接从外部 icudtl.dat 加载 ICU 数据，
-    # 避免链接到内嵌的 icudtXX_dat 符号。
+    # Windows/Android 都直接从外部 icudtl.dat 加载 ICU 数据。
+    # Windows 侧仍会保留一个 stub icudtXX_dat 入口点以满足 ICU 内部链接。
     target_compile_definitions(skia PRIVATE SKIA_USE_EXTERNAL_ICU_DATA=1)
 endif()
 
